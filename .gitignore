@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+data/dic_images/*
+!data/dic_images/.gitkeep
+data/fem_strain_maps/*
+!data/fem_strain_maps/.gitkeep
+random_forest.pkl
