@@ -14,7 +14,10 @@ class DataLoader:
         if not os.path.exists(self.dic_images_dir):
             return self._generate_mock_dic_sequence()
 
-        image_files = sorted(glob.glob(os.path.join(self.dic_images_dir, '*.png')))
+        # Support both PNG and JPG extensions
+        image_files = sorted(glob.glob(os.path.join(self.dic_images_dir, '*.[pP][nN][gG]')) + 
+                             glob.glob(os.path.join(self.dic_images_dir, '*.[jJ][pP][gG]')))
+                             
         if not image_files:
             return self._generate_mock_dic_sequence()
 
@@ -22,7 +25,15 @@ class DataLoader:
         for file in image_files:
             img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
             if img is not None:
-                sequence.append(img)
+                # Downscale raw experimental physics images drastically to prevent 
+                # infinite O(n) computing cycles inside ECC Maximization and RAFT.
+                height, width = img.shape
+                # Keep aspect ratio but limit max width/height to ~512
+                scale = min(512.0 / width, 512.0 / height)
+                new_dim = (int(width * scale), int(height * scale))
+                
+                img_resized = cv2.resize(img, new_dim, interpolation=cv2.INTER_AREA)
+                sequence.append(img_resized)
         return sequence
 
     def load_fem_strain_maps(self):

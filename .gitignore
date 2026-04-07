@@ -7,3 +7,4 @@ data/dic_images/*
 data/fem_strain_maps/*
 !data/fem_strain_maps/.gitkeep
 random_forest.pkl
+dataset_temp/

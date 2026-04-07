@@ -31,16 +31,23 @@ if st.sidebar.button("Run Full Pipeline"):
         dic_seq = loader.load_dic_sequence()
         processed_seq = preprocess_sequence(dic_seq)
     st.success(f"Loaded and preprocessed {len(processed_seq)} frames.")
+    
+    # Select which frames in time to analyze
+    frame_idx = st.sidebar.slider("Select Frame Timeline", 0, len(processed_seq) - 2, 0)
 
-    with st.spinner("Computing Dense Optical Flow (RAFT)..."):
-        # For performance, only compute flow for the first two frames in this demo
+    with st.spinner(f"Computing Dense Optical Flow (RAFT) on Frame {frame_idx}..."):
         raft = DenseOpticalFlowRAFT()
-        flow = raft.compute_flow(processed_seq[0], processed_seq[1])
+        flow = raft.compute_flow(processed_seq[frame_idx], processed_seq[frame_idx+1])
     st.success("Dense displacement field computed.")
 
     with st.spinner("Calculating Physics-based Stress Models..."):
         physics = PhysicsModeling(youngs_modulus=youngs_mod, poisson_ratio=poisson_r)
         vm_stress = physics.process_displacement_to_stress(flow)
+        
+        # ML Optimization: Normalize extreme physical pressures (Pascals) by the Young's Modulus
+        # to bring feature arrays back into a stable 0-1 numerical distribution for the Random Forest
+        vm_stress = vm_stress / youngs_mod
+        
     st.success("Strain and Stress models calculated.")
 
     with st.spinner("Extracting Features and Predicting Risk..."):
@@ -57,7 +64,7 @@ if st.sidebar.button("Run Full Pipeline"):
     col1, col2, col3 = st.columns(3)
     with col1:
         st.subheader("Base Frame")
-        st.image(processed_seq[0], caption="Frame 1 (Normalized)", use_column_width=True, clamp=True)
+        st.image(processed_seq[frame_idx], caption=f"Frame {frame_idx} (Normalized)", use_container_width=True, clamp=True)
     with col2:
         st.subheader("Dense Displacement (u-component)")
         fig, ax = plt.subplots()
