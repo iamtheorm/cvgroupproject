@@ -1,5 +1,7 @@
 # Visual Stress Detection System
 
+## TEAM : Ritik Mishra 23BCE10850, Anshika Shrivastava 23BAI10033 , Yash Pratap Singh 23BAI10012 , Amritasha Gupta 23BAI10048 , Sreyas Sunmesh 23BAI10062, Manasvi Joshi 23BHI10193
+
 ## Purpose
 This project is an advanced **Intelligent Vision System** that detects micro-deformations and predicts structural risk. It utilizes **Optical Flow (RAFT)** for tracking precise dense displacements across sequences, applies **Physics-Based Modeling** to compute strain and Von Mises stress mappings, and feeds the extracted features into a **Machine Learning Classifier** to assess structural failure probabilities.
 
